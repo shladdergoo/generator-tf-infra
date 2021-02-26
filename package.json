@@ -1,0 +1,62 @@
+{
+  "name": "generator-tf-infra",
+  "version": "0.1.0",
+  "description": "generator-tf-infra",
+  "license": "MIT",
+  "repository": "https://github.com/shladdergoo/generator-tf-infra",
+  "author": {
+    "name": "shladdergoo",
+    "email": "shladdergoo@users.noreply.github.com",
+    "url": "https://github.com/shladdergoo/generator-tf-infra"
+  },
+  "keywords": [
+    "yeoman-generator",
+    "terraform"
+  ],
+  "files": [
+    "lib/generators"
+  ],
+  "main": "lib/index",
+  "types": "lib/index",
+  "scripts": {
+    "clean": "rimraf lib && rimraf coverage",
+    "format": "prettier --write \"{src,__tests__}/**/*.ts\" --single-quote --trailing-comma es5",
+    "lint": "tslint --force --format verbose \"src/**/*.ts\"",
+    "prepublishOnly": "npm run build",
+    "prebuild": "npm run clean && npm run format && npm run lint && echo Using TypeScript && tsc --version",
+    "build": "tsc --pretty && cp -r src/templates/ lib/generators/app/templates/",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "watch": "npm run build -- --watch",
+    "watch:test": "jest --watch"
+  },
+  "dependencies": {
+    "yeoman-assert": "^3.1.1",
+    "yeoman-generator": "^4.13.0",
+    "yeoman-test": "^5.0.1",
+    "yosay": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.14",
+    "@types/node": "^14.14.31",
+    "@types/yeoman-assert": "^3.1.1",
+    "@types/yeoman-generator": "^4.11.3",
+    "@types/yeoman-test": "^4.0.0",
+    "@types/yosay": "0.0.29",
+    "coveralls": "^3.1.0",
+    "jest": "^26.6.3",
+    "prettier": "^1.19.1",
+    "rimraf": "^2.6.2",
+    "ts-jest": "^26.5.2",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "typescript": "^4.2.2"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest"
+  }
+}
