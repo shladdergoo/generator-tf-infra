@@ -18,8 +18,8 @@ export default class extends Generator {
   private fileOutputs = 'outputs.tf';
   private fileDependencies = 'dependencies.tf';
   private statciFiles = [
-    ['.gitignore', '.gitignore'],
-    ['.gitattributes', '.gitattributes'],
+    ['dotgitignore', '.gitignore'],
+    ['dotgitattributes', '.gitattributes'],
     ['README.md', 'README.md'],
     ['Makefile', 'Makefile'],
   ];

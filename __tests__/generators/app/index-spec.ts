@@ -40,7 +40,7 @@ test('Should create module', async () => {
   const expected = [
     'modules/someModule/main.tf',
     'modules/someModule/variables.tf',
-    'modules/someModule/outputs.tf'
+    'modules/someModule/outputs.tf',
   ];
 
   await helpers
@@ -56,7 +56,7 @@ test('Should create example', async () => {
     'examples/someModule/variables.tf',
     'examples/someModule/outputs.tf',
     'examples/someModule/dependencies.tf',
-    'examples/someModule/README.md'
+    'examples/someModule/README.md',
   ];
 
   await helpers
