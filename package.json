@@ -11,7 +11,8 @@
   },
   "keywords": [
     "yeoman-generator",
-    "terraform"
+    "terraform",
+    "typescript"
   ],
   "files": [
     "lib/generators"
