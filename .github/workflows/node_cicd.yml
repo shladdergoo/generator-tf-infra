@@ -1,10 +1,8 @@
 name: Node CICD
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  - push
+  - pull_request
 
 jobs:
   build:
@@ -25,11 +23,14 @@ jobs:
     - run: npm test
 
   publish:
+    # if: github.ref == 'refs/heads/master'
+
     needs: build
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+    - run: echo ${{github.ref}}
     - uses: actions/setup-node@v2
       with:
         node-version: '12.x'
