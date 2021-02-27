@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: npm
 
     strategy:
       matrix:
@@ -27,6 +28,7 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
+    environment: npm
 
     steps:
     - uses: actions/checkout@v2
@@ -34,3 +36,5 @@ jobs:
     - run: npm set //registry.npmjs.org/:_authToken='${NODE_AUTH_TOKEN}'
     # - run: npm version patch - TODO: Need to provide github identity for this to succeed
     - run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
