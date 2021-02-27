@@ -35,6 +35,7 @@ jobs:
         node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
         always-auth: true
+        token: '${NODE_AUTH_TOKEN}'
     - run: npm ci
     # - run: npm version patch - TODO: Need to provide github identity for this to succeed
     - run: npm publish
