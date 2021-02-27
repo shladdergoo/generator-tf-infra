@@ -36,3 +36,20 @@ In this case the infrastructure defined by the project is applied using the vari
 ```
 environments/dev/variables.tf
 ```
+
+## Pre-Commit Hook
+
+Install [pre-commit hooks](https://github.com/antonbabenko/pre-commit-terraform/tree/v1.11.0)
+
+### Prerequisites
+Install the pre-commit package
+
+On MacOSX install the pre-commit package
+
+```
+brew install pre-commit
+```
+### Usage
+```
+$ yo tf-infra --pre-commit
+```

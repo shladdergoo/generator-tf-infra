@@ -26,6 +26,8 @@ export default class extends Generator {
 
   public constructor(args: any, opts: any) {
     super(args, opts);
+
+    this.option('precommit', { type: Boolean });
   }
 
   public initializing(): void {
@@ -39,13 +41,20 @@ export default class extends Generator {
 
   public writing(): void {
     this.log('copying files');
-    this.log('environments', this.answers.environments);
 
     this._copyStaticFiles();
     this._createEnvironments();
     this._createMain();
     this._createModule();
     this._createExample();
+  }
+
+  public install(): void {
+    if (!this.options.precommit) {
+      return;
+    }
+
+    this._initGit();
   }
 
   private _copyStaticFiles(): void {
@@ -143,6 +152,12 @@ export default class extends Generator {
       ),
       { module: this.answers.initialModule }
     );
+  }
+
+  private _initGit(): void {
+    this.log('initializing git repo');
+
+    this.spawnCommand('git', ['init']);
   }
 
   private _ensureArray(possibleArray: any) {
