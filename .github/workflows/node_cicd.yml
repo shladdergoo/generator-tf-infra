@@ -35,6 +35,6 @@ jobs:
     - run: npm ci
     - run: npm set //registry.npmjs.org/:_authToken='${NODE_AUTH_TOKEN}'
     # - run: npm version patch - TODO: Need to provide github identity for this to succeed
-    - run: npm publish
+    - run: echo ${NODE_AUTH_TOKEN}
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
