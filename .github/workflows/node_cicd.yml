@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Node CI/CD
 
 on:
   push:
@@ -34,6 +34,7 @@ jobs:
       with:
         node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
+        always-auth: true
     - run: npm ci
     # - run: npm version patch - TODO: Need to provide github identity for this to succeed
     - run: npm publish
