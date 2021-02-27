@@ -36,8 +36,8 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
         always-auth: true
     - run: npm ci
-    - run: git config user.name "workflow"
-    - run: git config user.email "workflow@users.noreply.github.com"     
+    - run: git config user.name "gha-workflow"
+    - run: git config user.email "gha-workflow@users.noreply.github.com"     
     - run: npm version patch
     - run: npm publish
       env:
