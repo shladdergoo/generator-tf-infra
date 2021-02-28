@@ -25,7 +25,7 @@ $ yo tf-infra
 ***NOTE:** This template will generate files in the **current directory**, so be sure to always run it against the correct directory.*
 
 ## Terraform Operations
-The tasks `plan`, `apply` and `destroy` are defined in the generated `Makefile`
+The tasks `plan`, `apply` and `destroy` are defined in the generated `Makefile`.
 ```
 export AWS_PROFILE=dev_profile
 ENV=dev make apply
@@ -39,7 +39,7 @@ environments/dev/variables.tf
 
 ## Pre-Commit Hook
 
-Install [pre-commit hooks](https://github.com/antonbabenko/pre-commit-terraform/tree/v1.11.0)
+Optionally, you can install [pre-commit hooks](https://github.com/antonbabenko/pre-commit-terraform/tree/v1.11.0) to validate terraform files, enforce consistent formatting and create module documentation.
 
 ### Prerequisites
 Install the pre-commit package
@@ -50,6 +50,8 @@ On MacOSX install the pre-commit package
 brew install pre-commit
 ```
 ### Usage
+Run `generator-tf-infra` with the `--precommit` option.
 ```
-$ yo tf-infra --pre-commit
+$ yo tf-infra --precommit
 ```
+See `README.md` in the generated project for further details.

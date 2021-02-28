@@ -55,6 +55,9 @@ export default class extends Generator {
     }
 
     this._initGit();
+    this._addHook();
+    this._installHook();
+    this._updateReadme();
   }
 
   private _copyStaticFiles(): void {
@@ -158,6 +161,25 @@ export default class extends Generator {
     this.log('initializing git repo');
 
     this.spawnCommand('git', ['init']);
+  }
+
+  private _addHook() {
+    this.fs.copy(
+      this.templatePath('precommit/dotpre-commit-config.yaml'),
+      this.destinationPath('.pre-commit-config.yaml')
+    );
+  }
+
+  private _installHook() {
+    this.spawnCommand('pre-commit', ['install']);
+  }
+
+  private _updateReadme() {
+    this.fs.append(
+      this.destinationPath('README.md'),
+      this.fs.read(this.templatePath('precommit/README.md')),
+      { trimEnd: false }
+    );
   }
 
   private _ensureArray(possibleArray: any) {
