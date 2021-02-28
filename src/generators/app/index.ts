@@ -26,6 +26,8 @@ export default class extends Generator {
 
   public constructor(args: any, opts: any) {
     super(args, opts);
+
+    this.option('precommit', { type: Boolean });
   }
 
   public initializing(): void {
@@ -39,13 +41,23 @@ export default class extends Generator {
 
   public writing(): void {
     this.log('copying files');
-    this.log('environments', this.answers.environments);
 
     this._copyStaticFiles();
     this._createEnvironments();
     this._createMain();
     this._createModule();
     this._createExample();
+  }
+
+  public install(): void {
+    if (!this.options.precommit) {
+      return;
+    }
+
+    this._initGit();
+    this._addHook();
+    this._installHook();
+    this._updateReadme();
   }
 
   private _copyStaticFiles(): void {
@@ -142,6 +154,31 @@ export default class extends Generator {
         `${this.dirExamples}/${this.answers.initialModule}/README.md`
       ),
       { module: this.answers.initialModule }
+    );
+  }
+
+  private _initGit(): void {
+    this.log('initializing git repo');
+
+    this.spawnCommand('git', ['init']);
+  }
+
+  private _addHook() {
+    this.fs.copy(
+      this.templatePath('precommit/dotpre-commit-config.yaml'),
+      this.destinationPath('.pre-commit-config.yaml')
+    );
+  }
+
+  private _installHook() {
+    this.spawnCommand('pre-commit', ['install']);
+  }
+
+  private _updateReadme() {
+    this.fs.append(
+      this.destinationPath('README.md'),
+      this.fs.read(this.templatePath('precommit/README.md')),
+      { trimEnd: false }
     );
   }
 
