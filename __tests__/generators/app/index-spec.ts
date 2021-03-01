@@ -12,7 +12,17 @@ test('Should export default class', () => {
 });
 
 test('Should create static files', async () => {
-  const expected = ['.gitignore', '.gitattributes', 'Makefile', 'README.md'];
+  const expected = ['.gitignore', '.gitattributes', 'Makefile'];
+
+  await helpers
+    .run(path.join(__dirname, appModule))
+    .withPrompts({ provider: 'aws' });
+
+  assert.file(expected);
+});
+
+test('Should create readme', async () => {
+  const expected = ['README.md'];
 
   await helpers
     .run(path.join(__dirname, appModule))
