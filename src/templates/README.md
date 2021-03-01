@@ -1,1 +1,1 @@
-# Terraform Infrastucture Project
+# <%= heading %>

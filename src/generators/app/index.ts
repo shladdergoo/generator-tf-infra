@@ -20,7 +20,6 @@ export default class extends Generator {
   private statciFiles = [
     ['dotgitignore', '.gitignore'],
     ['dotgitattributes', '.gitattributes'],
-    ['README.md', 'README.md'],
     ['Makefile', 'Makefile'],
   ];
 
@@ -43,6 +42,7 @@ export default class extends Generator {
     this.log('copying files');
 
     this._copyStaticFiles();
+    this._copyReadme();
     this._createEnvironments();
     this._createMain();
     this._createModule();
@@ -67,6 +67,16 @@ export default class extends Generator {
         this.destinationPath(fileCopyTuple[1])
       );
     });
+  }
+
+  private _copyReadme() {
+    const projectName = this.contextRoot.split('/').pop();
+
+    this.fs.copyTpl(
+      this.templatePath('README.md'),
+      this.destinationPath('README.md'),
+      { heading: projectName }
+    );
   }
 
   private _createEnvironments(): void {
