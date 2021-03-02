@@ -75,3 +75,33 @@ test('Should not create examples when sample not requested', async () => {
 
   assert.noFile(notExpected);
 });
+
+test('Should create sample module when requested', async () => {
+  const expected = [
+    'modules/vpc/main.tf',
+    'modules/vpc/variables.tf',
+    'modules/vpc/outputs.tf',
+  ];
+
+  await helpers
+    .run(path.join(__dirname, appModule))
+    .withPrompts({ provider: 'aws', createSampleModule: true });
+
+  assert.file(expected);
+});
+
+test('Should create examples when sample requested', async () => {
+  const expected = [
+    'examples/vpc/main.tf',
+    'examples/vpc/variables.tf',
+    'examples/vpc/outputs.tf',
+    'examples/vpc/dependencies.tf',
+    'examples/vpc/README.md',
+  ];
+
+  await helpers
+    .run(path.join(__dirname, appModule))
+    .withPrompts({ provider: 'aws', createSampleModule: true });
+
+  assert.file(expected);
+});

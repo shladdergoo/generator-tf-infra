@@ -156,7 +156,7 @@ export default class extends Generator {
       this.fs.copy(
         this.templatePath(`example/${filename}`),
         this.destinationPath(
-          `${this.dirExamples}/${this.answers.initialModule}/${filename}`
+          `${this.dirExamples}/${this.sampleModuleName}/${filename}`
         )
       );
     });
@@ -164,7 +164,7 @@ export default class extends Generator {
     this.fs.copyTpl(
       this.templatePath('example/README.md'),
       this.destinationPath(
-        `${this.dirExamples}/${this.answers.initialModule}/README.md`
+        `${this.dirExamples}/${this.sampleModuleName}/README.md`
       ),
       { module: this.answers.initialModule }
     );
