@@ -9,7 +9,7 @@ export default class extends Generator {
   private stateBucketDefault = 'terraform-state';
   private stateKeyDefault = 'terraform.tfstate';
   private lockTableDefault = 'terraform-locks';
-  private initialModuleDefault = 'module1';
+  private sampleModuleDefault = false;
   private dirEnvironments = 'environments';
   private dirModules = 'modules';
   private dirExamples = 'examples';
@@ -45,8 +45,10 @@ export default class extends Generator {
     this._copyReadme();
     this._createEnvironments();
     this._createMain();
-    this._createModule();
-    this._createExample();
+    if (this.answers.createSampleModule) {
+      this._createSampleModule();
+      this._createExample();
+    }
   }
 
   public install(): void {
@@ -118,7 +120,7 @@ export default class extends Generator {
     );
   }
 
-  private _createModule() {
+  private _createSampleModule() {
     this.fs.copy(
       this.templatePath(`module/${this.fileMain}`),
       this.destinationPath(
@@ -240,10 +242,10 @@ export default class extends Generator {
         type: 'input',
       },
       {
-        default: this.initialModuleDefault,
-        message: 'Initial module name',
-        name: 'initialModule',
-        type: 'input',
+        default: this.sampleModuleDefault,
+        message: 'Create sample module (VPC)?',
+        name: 'sampleModule',
+        type: 'confirm',
       },
     ]);
   }

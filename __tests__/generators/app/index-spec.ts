@@ -46,32 +46,32 @@ test('Should create environments', async () => {
   assert.file(expected);
 });
 
-test('Should create module', async () => {
-  const expected = [
-    'modules/someModule/main.tf',
-    'modules/someModule/variables.tf',
-    'modules/someModule/outputs.tf',
+test('Should not create sample module when not requested', async () => {
+  const notExpected = [
+    'modules/vpc/main.tf',
+    'modules/vpc/variables.tf',
+    'modules/vpc/outputs.tf',
   ];
 
   await helpers
     .run(path.join(__dirname, appModule))
-    .withPrompts({ initialModule: 'someModule', provider: 'aws' });
+    .withPrompts({ provider: 'aws' });
 
-  assert.file(expected);
+  assert.noFile(notExpected);
 });
 
-test('Should create example', async () => {
-  const expected = [
-    'examples/someModule/main.tf',
-    'examples/someModule/variables.tf',
-    'examples/someModule/outputs.tf',
-    'examples/someModule/dependencies.tf',
-    'examples/someModule/README.md',
+test('Should not create examples when sample not requested', async () => {
+  const notExpected = [
+    'examples/vpc/main.tf',
+    'examples/vpc/variables.tf',
+    'examples/vpc/outputs.tf',
+    'examples/vpc/dependencies.tf',
+    'examples/vpc/README.md',
   ];
 
   await helpers
     .run(path.join(__dirname, appModule))
     .withPrompts({ initialModule: 'someModule', provider: 'aws' });
 
-  assert.file(expected);
+  assert.noFile(notExpected);
 });
