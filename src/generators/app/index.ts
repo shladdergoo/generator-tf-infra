@@ -166,7 +166,6 @@ export default class extends Generator {
 
   private _createExample() {
     const exampleFiles = [
-      this.fileMain,
       this.fileVariables,
       this.fileDependencies,
       this.fileOutputs,
@@ -186,7 +185,15 @@ export default class extends Generator {
       this.destinationPath(
         `${this.dirExamples}/${this.sampleModuleName}/README.md`
       ),
-      { module: this.sampleModuleName }
+      { module: this.sampleModuleName, env: this.answers.environments[0] }
+    );
+
+    this.fs.copyTpl(
+      this.templatePath(`example/${this.fileMain}`),
+      this.destinationPath(
+        `${this.dirExamples}/${this.sampleModuleName}/${this.fileMain}`
+      ),
+      { provider: this.answers.provider, region: this.answers.region }
     );
   }
 

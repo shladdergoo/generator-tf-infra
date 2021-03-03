@@ -8,24 +8,20 @@ account](http://aws.amazon.com/).
 
 ## Quick start
 
-Configure your [AWS access 
-keys](http://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) as 
-environment variables:
+Configure your [credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 
-```
-export AWS_ACCESS_KEY_ID=(your access key id)
-export AWS_SECRET_ACCESS_KEY=(your secret access key)
-```
 
 Deploy the code:
 
 ```
-terraform init
-terraform apply
+export AWS_PROFILE=<%= env %>_profile
+
+ENV=<%= env %> make init
+ENV=<%= env %> make apply
 ```
 
 Clean up when you're done:
 
 ```
-terraform destroy
+ENV=<%= env %> make destroy
 ```

@@ -11,5 +11,5 @@ variable vpc_public_subnets {
 }
 
 variable vpc_azs {
-  default = ["<%= region %>a", "<%= region %>ab"]
+  default = ["<%= region %>a", "<%= region %>b"]
 }
