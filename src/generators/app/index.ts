@@ -1,7 +1,10 @@
+import * as ejs from 'ejs';
+import { AppendOptions } from 'mem-fs-editor';
 import * as Generator from 'yeoman-generator';
 import yosay = require('yosay');
 
 export default class extends Generator {
+  private projectName = this.contextRoot.split('/').pop();
   private answers: any;
   private providers = ['aws'];
   private regionDefault = 'us-east-1';
@@ -48,6 +51,7 @@ export default class extends Generator {
     this._createMain();
     if (this.answers.createSampleModule) {
       this._createSampleModule();
+      this._addModuleImplementation();
       this._createExample();
     }
   }
@@ -73,12 +77,10 @@ export default class extends Generator {
   }
 
   private _copyReadme() {
-    const projectName = this.contextRoot.split('/').pop();
-
     this.fs.copyTpl(
       this.templatePath('README.md'),
       this.destinationPath('README.md'),
-      { heading: projectName }
+      { heading: this.projectName }
     );
   }
 
@@ -144,6 +146,24 @@ export default class extends Generator {
     );
   }
 
+  private _addModuleImplementation() {
+    this._appendTpl(
+      this.destinationPath(this.fileVariables),
+      this.fs.read(this.templatePath('module/root_variables.tf')),
+      { region: this.answers.region },
+      undefined,
+      { trimEnd: false }
+    );
+
+    this._appendTpl(
+      this.destinationPath(this.fileMain),
+      this.fs.read(this.templatePath('module/root_main.tf')),
+      { project: this.projectName },
+      undefined,
+      { trimEnd: false }
+    );
+  }
+
   private _createExample() {
     const exampleFiles = [
       this.fileMain,
@@ -166,7 +186,7 @@ export default class extends Generator {
       this.destinationPath(
         `${this.dirExamples}/${this.sampleModuleName}/README.md`
       ),
-      { module: this.answers.initialModule }
+      { module: this.sampleModuleName }
     );
   }
 
@@ -249,5 +269,26 @@ export default class extends Generator {
         type: 'confirm',
       },
     ]);
+  }
+
+  private _appendTpl(
+    filepath: string,
+    contents: string,
+    context?: ejs.Data | undefined,
+    tplSettings?: ejs.Options | undefined,
+    options?: AppendOptions | undefined
+  ): void {
+    if (context === undefined) {
+      context = {};
+    }
+    if (tplSettings === undefined) {
+      tplSettings = {};
+    }
+
+    const renderedContents = ejs
+      .render(contents.toString(), context, tplSettings)
+      .toString();
+
+    this.fs.append(filepath, renderedContents, options);
   }
 }
