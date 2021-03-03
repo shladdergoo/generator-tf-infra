@@ -1,7 +1,10 @@
+import * as ejs from 'ejs';
+import { AppendOptions } from 'mem-fs-editor';
 import * as Generator from 'yeoman-generator';
 import yosay = require('yosay');
 
 export default class extends Generator {
+  private projectName = this.contextRoot.split('/').pop();
   private answers: any;
   private providers = ['aws'];
   private regionDefault = 'us-east-1';
@@ -9,7 +12,8 @@ export default class extends Generator {
   private stateBucketDefault = 'terraform-state';
   private stateKeyDefault = 'terraform.tfstate';
   private lockTableDefault = 'terraform-locks';
-  private initialModuleDefault = 'module1';
+  private sampleModuleDefault = false;
+  private sampleModuleName = 'vpc';
   private dirEnvironments = 'environments';
   private dirModules = 'modules';
   private dirExamples = 'examples';
@@ -45,8 +49,11 @@ export default class extends Generator {
     this._copyReadme();
     this._createEnvironments();
     this._createMain();
-    this._createModule();
-    this._createExample();
+    if (this.answers.createSampleModule) {
+      this._createSampleModule();
+      this._addModuleImplementation();
+      this._createExample();
+    }
   }
 
   public install(): void {
@@ -70,12 +77,10 @@ export default class extends Generator {
   }
 
   private _copyReadme() {
-    const projectName = this.contextRoot.split('/').pop();
-
     this.fs.copyTpl(
       this.templatePath('README.md'),
       this.destinationPath('README.md'),
-      { heading: projectName }
+      { heading: this.projectName }
     );
   }
 
@@ -118,32 +123,49 @@ export default class extends Generator {
     );
   }
 
-  private _createModule() {
+  private _createSampleModule() {
     this.fs.copy(
       this.templatePath(`module/${this.fileMain}`),
       this.destinationPath(
-        `${this.dirModules}/${this.answers.initialModule}/${this.fileMain}`
+        `${this.dirModules}/${this.sampleModuleName}/${this.fileMain}`
       )
     );
 
     this.fs.copy(
       this.templatePath(`module/${this.fileVariables}`),
       this.destinationPath(
-        `${this.dirModules}/${this.answers.initialModule}/${this.fileVariables}`
+        `${this.dirModules}/${this.sampleModuleName}/${this.fileVariables}`
       )
     );
 
     this.fs.copy(
       this.templatePath(`module/${this.fileOutputs}`),
       this.destinationPath(
-        `${this.dirModules}/${this.answers.initialModule}/${this.fileOutputs}`
+        `${this.dirModules}/${this.sampleModuleName}/${this.fileOutputs}`
       )
+    );
+  }
+
+  private _addModuleImplementation() {
+    this._appendTpl(
+      this.destinationPath(this.fileVariables),
+      this.fs.read(this.templatePath('module/root_variables.tf')),
+      { region: this.answers.region },
+      undefined,
+      { trimEnd: false }
+    );
+
+    this._appendTpl(
+      this.destinationPath(this.fileMain),
+      this.fs.read(this.templatePath('module/root_main.tf')),
+      { project: this.projectName },
+      undefined,
+      { trimEnd: false }
     );
   }
 
   private _createExample() {
     const exampleFiles = [
-      this.fileMain,
       this.fileVariables,
       this.fileDependencies,
       this.fileOutputs,
@@ -153,7 +175,7 @@ export default class extends Generator {
       this.fs.copy(
         this.templatePath(`example/${filename}`),
         this.destinationPath(
-          `${this.dirExamples}/${this.answers.initialModule}/${filename}`
+          `${this.dirExamples}/${this.sampleModuleName}/${filename}`
         )
       );
     });
@@ -161,9 +183,17 @@ export default class extends Generator {
     this.fs.copyTpl(
       this.templatePath('example/README.md'),
       this.destinationPath(
-        `${this.dirExamples}/${this.answers.initialModule}/README.md`
+        `${this.dirExamples}/${this.sampleModuleName}/README.md`
       ),
-      { module: this.answers.initialModule }
+      { module: this.sampleModuleName, env: this.answers.environments[0] }
+    );
+
+    this.fs.copyTpl(
+      this.templatePath(`example/${this.fileMain}`),
+      this.destinationPath(
+        `${this.dirExamples}/${this.sampleModuleName}/${this.fileMain}`
+      ),
+      { provider: this.answers.provider, region: this.answers.region }
     );
   }
 
@@ -240,11 +270,32 @@ export default class extends Generator {
         type: 'input',
       },
       {
-        default: this.initialModuleDefault,
-        message: 'Initial module name',
-        name: 'initialModule',
-        type: 'input',
+        default: this.sampleModuleDefault,
+        message: 'Create sample module (VPC)?',
+        name: 'createSampleModule',
+        type: 'confirm',
       },
     ]);
+  }
+
+  private _appendTpl(
+    filepath: string,
+    contents: string,
+    context?: ejs.Data | undefined,
+    tplSettings?: ejs.Options | undefined,
+    options?: AppendOptions | undefined
+  ): void {
+    if (context === undefined) {
+      context = {};
+    }
+    if (tplSettings === undefined) {
+      tplSettings = {};
+    }
+
+    const renderedContents = ejs
+      .render(contents.toString(), context, tplSettings)
+      .toString();
+
+    this.fs.append(filepath, renderedContents, options);
   }
 }
