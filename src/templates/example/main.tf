@@ -7,8 +7,8 @@ provider "<%= provider %>" {
   region = <%= region %>
 }
 
-module "vpc-output" {
-  source              = ".../../modules/vpc"
+module "vpc" {
+  source              = "../../modules/vpc"
   region              = "<%= region %>"
   label               = "example"
   vpc_name            = "example-vpc"
