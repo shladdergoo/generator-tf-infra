@@ -33,10 +33,10 @@ test('Should create readme', async () => {
 
 test('Should create environments', async () => {
   const expected = [
-    'environments/env1/backend.tf',
-    'environments/env1/variables.tf',
-    'environments/env2/backend.tf',
-    'environments/env2/variables.tf',
+    'environments/env1/backend.tfvars',
+    'environments/env1/variables.tfvars',
+    'environments/env2/backend.tfvars',
+    'environments/env2/variables.tfvars',
   ];
 
   await helpers
