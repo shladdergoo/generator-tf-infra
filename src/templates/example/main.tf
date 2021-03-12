@@ -4,7 +4,7 @@ terraform {
 }
 
 provider "<%= provider %>" {
-  region = <%= region %>
+  region = "<%= region %>"
 }
 
 module "vpc" {
