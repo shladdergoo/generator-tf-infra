@@ -65,6 +65,10 @@ export default class extends Generator {
     this._addHook();
     this._installHook();
     this._updateReadme();
+    if (this.answers.createSampleModule) {
+      this._createModuleReadmeForDocs();
+    }
+    this._stageGitChanges();
   }
 
   private _copyStaticFiles(): void {
@@ -198,7 +202,7 @@ export default class extends Generator {
   private _initGit(): void {
     this.log('initializing git repo');
 
-    this.spawnCommand('git', ['init']);
+    this.spawnCommandSync('git', ['init']);
   }
 
   private _addHook() {
@@ -213,11 +217,26 @@ export default class extends Generator {
   }
 
   private _updateReadme() {
+    this.env.sharedFs.get(this.destinationPath('README.md')).conflicter =
+      'force';
     this.fs.append(
       this.destinationPath('README.md'),
-      this.fs.read(this.templatePath('precommit/README.md')),
+      this.fs.read(this.templatePath('precommit/root_README.md')),
       { trimEnd: false }
     );
+  }
+
+  private _createModuleReadmeForDocs() {
+    this.fs.copy(
+      this.templatePath('precommit/README.md'),
+      this.destinationPath(`modules/${this.sampleModuleName}/README.md`)
+    );
+  }
+
+  private _stageGitChanges() {
+    this.log('staging changes');
+
+    this.spawnCommand('git', ['add', '.']);
   }
 
   private _ensureArray(possibleArray: any) {
