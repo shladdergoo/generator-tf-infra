@@ -87,8 +87,8 @@ export default class extends Generator {
   private _createEnvironments(): void {
     this.answers.environments.forEach((env: string) => {
       this.fs.copyTpl(
-        this.templatePath('env/backend.tf'),
-        this.destinationPath(`${this.dirEnvironments}/${env}/backend.tf`),
+        this.templatePath('env/backend.tfvars'),
+        this.destinationPath(`${this.dirEnvironments}/${env}/backend.tfvars`),
         {
           bucket: this.answers.stateBucket,
           key: `${env}/${this.stateKeyDefault}`,
@@ -98,10 +98,8 @@ export default class extends Generator {
       );
 
       this.fs.copyTpl(
-        this.templatePath(`env/${this.fileVariables}`),
-        this.destinationPath(
-          `${this.dirEnvironments}/${env}/${this.fileVariables}`
-        ),
+        this.templatePath(`env/variables.tfvars`),
+        this.destinationPath(`${this.dirEnvironments}/${env}/variables.tfvars`),
         {
           env: `${env}`,
         }
