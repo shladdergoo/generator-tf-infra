@@ -42,12 +42,12 @@ environments/dev/variables.tf
 Optionally, you can install [pre-commit hooks](https://github.com/antonbabenko/pre-commit-terraform) to validate terraform files, enforce consistent formatting and create module documentation.
 
 ### Prerequisites
-Install the pre-commit package
+Install the pre-commit package and the required dependencies
 
-On MacOSX install the pre-commit package
+On MacOSX:
 
 ```
-brew install pre-commit
+brew install pre-commit gawk terraform-docs tflint tfsec coreutils checkov
 ```
 ### Usage
 Run `generator-tf-infra` with the `--precommit` option.
