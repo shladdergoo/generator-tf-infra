@@ -55,3 +55,19 @@ Run `generator-tf-infra` with the `--precommit` option.
 $ yo tf-infra --precommit
 ```
 See `README.md` in the generated project for further details.
+
+## Tests
+
+Optionally, you can generate sample tests to accompany the sample module. These are built on the [terratest](https://terratest.gruntwork.io/) library and prove the correctness of the sample module in isolation of other infrastructure elements.
+
+### Prerequisites
+To use Terratest, you need to install:
+
+[Go](https://golang.org/) (requires version >=1.13)
+
+### Usage
+Run `generator-tf-infra` with the `--tests` option (this can be combined with the `--precommit` option).
+```
+$ yo tf-infra --tests
+```
+Note: this option does nothing if you opt not to generate the sample module.
