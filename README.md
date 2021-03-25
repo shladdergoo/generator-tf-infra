@@ -34,7 +34,7 @@ Where `dev` is one of the environment names supplied when running the generator 
 
 In this case the infrastructure defined by the project is applied using the variables defined in
 ```
-environments/dev/variables.tf
+environments/dev/variables.tfvars
 ```
 
 ## Pre-Commit Hook
