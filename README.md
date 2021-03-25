@@ -48,7 +48,7 @@ Install the pre-commit package and the required dependencies
 On MacOSX:
 
 ```
-brew install pre-commit gawk terraform-docs tflint tfsec coreutils checkov
+$ brew install pre-commit gawk terraform-docs tflint tfsec coreutils checkov
 ```
 ### Usage
 Run `generator-tf-infra` with the `--precommit` option.
