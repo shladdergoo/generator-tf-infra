@@ -60,6 +60,8 @@ See `README.md` in the generated project for further details.
 
 Optionally, you can generate sample tests to accompany the sample module. These are built on the [terratest](https://terratest.gruntwork.io/) library and prove the correctness of the sample module in isolation of other infrastructure elements.
 
+Tests heavily informed by (https://terratest.gruntwork.io/docs/getting-started/quick-start/#example-2-terraform-and-aws)
+
 ### Prerequisites
 To use Terratest, you need to install:
 
