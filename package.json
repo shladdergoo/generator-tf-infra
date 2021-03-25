@@ -12,7 +12,8 @@
   "keywords": [
     "yeoman-generator",
     "terraform",
-    "typescript"
+    "typescript",
+    "terratest"
   ],
   "files": [
     "lib/generators"
