@@ -31,7 +31,16 @@ export default class extends Generator {
   public constructor(args: any, opts: any) {
     super(args, opts);
 
-    this.option('precommit', { type: Boolean });
+    this.option('precommit', {
+      default: false,
+      description: 'Install a pre-commit hook for formatting and validation',
+      type: Boolean,
+    });
+    this.option('tests', {
+      default: false,
+      description: 'Generate tests for the (optional) sample module',
+      type: Boolean,
+    });
   }
 
   public initializing(): void {

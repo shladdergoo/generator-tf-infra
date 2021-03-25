@@ -20,6 +20,7 @@ Also prioritises executing operations from a single common entry point to aid in
 ## Usage
 ```
 $ yo tf-infra
+$ yo tf-infra --help
 ```
 
 ***NOTE:** This template will generate files in the **current directory**, so be sure to always run it against the correct directory.*
