@@ -17,6 +17,7 @@ export default class extends Generator {
   private dirEnvironments = 'environments';
   private dirModules = 'modules';
   private dirExamples = 'examples';
+  private dirTests = 'tests';
   private fileMain = 'main.tf';
   private fileVariables = 'variables.tf';
   private fileOutputs = 'outputs.tf';
@@ -53,14 +54,27 @@ export default class extends Generator {
       this._createSampleModule();
       this._addModuleImplementation();
       this._createExample();
+      if (this.options.tests) {
+        this._createTests();
+      }
     }
   }
 
   public install(): void {
-    if (!this.options.precommit) {
-      return;
+    if (this.options.precommit) {
+      this._addPrecommitHook();
     }
 
+    if (this.options.tests) {
+      if (!this.answers.createSampleModule) {
+        this.log('sample module not generated, ignoring --tests');
+        return;
+      }
+      this._initialiseTests();
+    }
+  }
+
+  private _addPrecommitHook() {
     this._initGit();
     this._addHook();
     this._installHook();
@@ -197,6 +211,24 @@ export default class extends Generator {
       ),
       { provider: this.answers.provider, region: this.answers.region }
     );
+  }
+
+  private _createTests() {
+    this.fs.copy(
+      this.templatePath('test/vpc_test.go'),
+      this.destinationPath(`${this.dirTests}/vpc_test.go`)
+    );
+
+    this.fs.copy(
+      this.templatePath('test/README.md'),
+      this.destinationPath(`${this.dirTests}/README.md`)
+    );
+  }
+
+  private _initialiseTests() {
+    this.spawnCommand('go', ['mod', 'init', `${this.projectName}.com/test`], {
+      cwd: this.dirTests,
+    });
   }
 
   private _initGit(): void {

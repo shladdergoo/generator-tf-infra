@@ -1,6 +1,5 @@
 terraform {
   required_version = ">= 0.13"
-  backend "s3" {}
 }
 
 provider "<%= provider %>" {
@@ -10,7 +9,7 @@ provider "<%= provider %>" {
 module "vpc" {
   source              = "../../modules/vpc"
   region              = "<%= region %>"
-  label               = "example"
+  label               = var.label
   vpc_name            = "example-vpc"
   vpc_description     = "Host VPC - example"
   vpc_cidr            = "172.30.0.0/16"

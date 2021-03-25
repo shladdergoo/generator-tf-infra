@@ -105,3 +105,35 @@ test('Should create examples when sample requested', async () => {
 
   assert.file(expected);
 });
+
+test('Should not create tests when tests not requested', async () => {
+  const notExpected = ['tests/README.md', 'tests/vpc_test.go'];
+
+  await helpers
+    .run(path.join(__dirname, appModule))
+    .withPrompts({ provider: 'aws' });
+
+  assert.noFile(notExpected);
+});
+
+test('Should not create tests when tests requested but example not generate', async () => {
+  const notExpected = ['tests/README.md', 'tests/vpc_test.go'];
+
+  await helpers
+    .run(path.join(__dirname, appModule))
+    .withPrompts({ provider: 'aws' })
+    .withArguments(['tests']);
+
+  assert.noFile(notExpected);
+});
+
+test('Should create tests when tests requested and sample generated', async () => {
+  const expected = ['tests/README.md', 'tests/vpc_test.go'];
+
+  await helpers
+    .run(path.join(__dirname, appModule))
+    .withPrompts({ provider: 'aws', createSampleModule: true })
+    .withArguments(['--tests']);
+
+  assert.file(expected);
+});
