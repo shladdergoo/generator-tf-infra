@@ -3,30 +3,12 @@ import { AppendOptions } from 'mem-fs-editor';
 import * as Generator from 'yeoman-generator';
 import yosay = require('yosay');
 
+import { Defaults } from './defaults';
+
 export default class extends Generator {
   private projectName = this.contextRoot.split('/').pop();
   private answers: any;
-  private providers = ['aws'];
-  private regionDefault = 'us-east-1';
-  private envListDefault = ['dev', 'staging', 'prod'];
-  private stateBucketDefault = 'terraform-state';
-  private stateKeyDefault = 'terraform.tfstate';
-  private lockTableDefault = 'terraform-locks';
-  private sampleModuleDefault = false;
-  private sampleModuleName = 'vpc';
-  private dirEnvironments = 'environments';
-  private dirModules = 'modules';
-  private dirExamples = 'examples';
-  private dirTests = 'tests';
-  private fileMain = 'main.tf';
-  private fileVariables = 'variables.tf';
-  private fileOutputs = 'outputs.tf';
-  private fileDependencies = 'dependencies.tf';
-  private statciFiles = [
-    ['dotgitignore', '.gitignore'],
-    ['dotgitattributes', '.gitattributes'],
-    ['Makefile', 'Makefile'],
-  ];
+  private provider = Defaults.providers[0].provider;
 
   public constructor(args: any, opts: any) {
     super(args, opts);
@@ -57,12 +39,13 @@ export default class extends Generator {
 
     this._copyStaticFiles();
     this._copyReadme();
-    this._createEnvironments();
-    this._createMain();
+    this._copyMakefile(this.provider);
+    this._createEnvironments(this.provider);
+    this._createMain(this.provider);
     if (this.answers.createSampleModule) {
-      this._createSampleModule();
-      this._addModuleImplementation();
-      this._createExample();
+      this._createSampleModule(this.provider);
+      this._addModuleImplementation(this.provider);
+      this._createExample(this.provider);
       if (this.options.tests) {
         this._createTests();
       }
@@ -95,7 +78,7 @@ export default class extends Generator {
   }
 
   private _copyStaticFiles(): void {
-    this.statciFiles.forEach(fileCopyTuple => {
+    Defaults.statciFiles.forEach(fileCopyTuple => {
       this.fs.copy(
         this.templatePath(fileCopyTuple[0]),
         this.destinationPath(fileCopyTuple[1])
@@ -111,22 +94,33 @@ export default class extends Generator {
     );
   }
 
-  private _createEnvironments(): void {
+  private _copyMakefile(provider: any) {
+    this.fs.copy(
+      this.templatePath(`make/${provider}/Makefile`),
+      this.destinationPath('Makefile')
+    );
+  }
+
+  private _createEnvironments(provider: string): void {
     this.answers.environments.forEach((env: string) => {
       this.fs.copyTpl(
-        this.templatePath('env/backend.tfvars'),
-        this.destinationPath(`${this.dirEnvironments}/${env}/backend.tfvars`),
+        this.templatePath(`env/${provider}/backend.tfvars`),
+        this.destinationPath(
+          `${Defaults.dirEnvironments}/${env}/backend.tfvars`
+        ),
         {
           bucket: this.answers.stateBucket,
-          key: `${env}/${this.stateKeyDefault}`,
+          key: `${env}/${Defaults.stateKeyDefault}`,
           region: this.answers.region,
           table: `${env}-${this.answers.lockTable}`,
         }
       );
 
       this.fs.copyTpl(
-        this.templatePath(`env/variables.tfvars`),
-        this.destinationPath(`${this.dirEnvironments}/${env}/variables.tfvars`),
+        this.templatePath(`env/${provider}/variables.tfvars`),
+        this.destinationPath(
+          `${Defaults.dirEnvironments}/${env}/variables.tfvars`
+        ),
         {
           env: `${env}`,
         }
@@ -134,109 +128,109 @@ export default class extends Generator {
     });
   }
 
-  private _createMain(): void {
+  private _createMain(provider: string): void {
     this.fs.copyTpl(
-      this.templatePath(this.fileMain),
-      this.destinationPath(this.fileMain),
-      { provider: this.answers.provider }
+      this.templatePath(`main/${provider}/${Defaults.fileMain}`),
+      this.destinationPath(Defaults.fileMain),
+      { provider: this.provider }
     );
 
     this.fs.copyTpl(
-      this.templatePath(this.fileVariables),
-      this.destinationPath(this.fileVariables),
+      this.templatePath(`main/${provider}/${Defaults.fileVariables}`),
+      this.destinationPath(Defaults.fileVariables),
       { region: this.answers.region }
     );
   }
 
-  private _createSampleModule() {
+  private _createSampleModule(provider: string) {
     this.fs.copy(
-      this.templatePath(`module/${this.fileMain}`),
+      this.templatePath(`module/${provider}/${Defaults.fileMain}`),
       this.destinationPath(
-        `${this.dirModules}/${this.sampleModuleName}/${this.fileMain}`
+        `${Defaults.dirModules}/${Defaults.sampleModuleName}/${Defaults.fileMain}`
       )
     );
 
     this.fs.copy(
-      this.templatePath(`module/${this.fileVariables}`),
+      this.templatePath(`module/${provider}/${Defaults.fileVariables}`),
       this.destinationPath(
-        `${this.dirModules}/${this.sampleModuleName}/${this.fileVariables}`
+        `${Defaults.dirModules}/${Defaults.sampleModuleName}/${Defaults.fileVariables}`
       )
     );
 
     this.fs.copy(
-      this.templatePath(`module/${this.fileOutputs}`),
+      this.templatePath(`module/${provider}/${Defaults.fileOutputs}`),
       this.destinationPath(
-        `${this.dirModules}/${this.sampleModuleName}/${this.fileOutputs}`
+        `${Defaults.dirModules}/${Defaults.sampleModuleName}/${Defaults.fileOutputs}`
       )
     );
   }
 
-  private _addModuleImplementation() {
+  private _addModuleImplementation(provider: string) {
     this._appendTpl(
-      this.destinationPath(this.fileVariables),
-      this.fs.read(this.templatePath('module/root_variables.tf')),
+      this.destinationPath(Defaults.fileVariables),
+      this.fs.read(this.templatePath(`module/${provider}/root_variables.tf`)),
       { region: this.answers.region },
       undefined,
       { trimEnd: false }
     );
 
     this._appendTpl(
-      this.destinationPath(this.fileMain),
-      this.fs.read(this.templatePath('module/root_main.tf')),
+      this.destinationPath(Defaults.fileMain),
+      this.fs.read(this.templatePath(`module/${provider}/root_main.tf`)),
       { project: this.projectName },
       undefined,
       { trimEnd: false }
     );
   }
 
-  private _createExample() {
+  private _createExample(provider: string) {
     const exampleFiles = [
-      this.fileVariables,
-      this.fileDependencies,
-      this.fileOutputs,
+      Defaults.fileVariables,
+      Defaults.fileDependencies,
+      Defaults.fileOutputs,
     ];
 
     exampleFiles.forEach((filename: string) => {
       this.fs.copy(
-        this.templatePath(`example/${filename}`),
+        this.templatePath(`example/${provider}/${filename}`),
         this.destinationPath(
-          `${this.dirExamples}/${this.sampleModuleName}/${filename}`
+          `${Defaults.dirExamples}/${Defaults.sampleModuleName}/${filename}`
         )
       );
     });
 
     this.fs.copyTpl(
-      this.templatePath('example/README.md'),
+      this.templatePath(`example/${provider}/README.md`),
       this.destinationPath(
-        `${this.dirExamples}/${this.sampleModuleName}/README.md`
+        `${Defaults.dirExamples}/${Defaults.sampleModuleName}/README.md`
       ),
-      { module: this.sampleModuleName, env: this.answers.environments[0] }
+      { module: Defaults.sampleModuleName, env: this.answers.environments[0] }
     );
 
     this.fs.copyTpl(
-      this.templatePath(`example/${this.fileMain}`),
+      this.templatePath(`example/${provider}/${Defaults.fileMain}`),
       this.destinationPath(
-        `${this.dirExamples}/${this.sampleModuleName}/${this.fileMain}`
+        `${Defaults.dirExamples}/${Defaults.sampleModuleName}/${Defaults.fileMain}`
       ),
-      { provider: this.answers.provider, region: this.answers.region }
+      { provider: this.provider, region: this.answers.region }
     );
   }
 
   private _createTests() {
     this.fs.copy(
       this.templatePath('test/vpc_test.go'),
-      this.destinationPath(`${this.dirTests}/vpc_test.go`)
+      this.destinationPath(`${Defaults.dirTests}/vpc_test.go`)
     );
 
     this.fs.copy(
       this.templatePath('test/README.md'),
-      this.destinationPath(`${this.dirTests}/README.md`)
+      this.destinationPath(`${Defaults.dirTests}/README.md`)
     );
   }
 
   private _initialiseTests() {
     this.spawnCommand('go', ['mod', 'init', `${this.projectName}.com/test`], {
-      cwd: this.dirTests,
+      cwd: Defaults.dirTests,
     });
   }
 
@@ -270,7 +264,7 @@ export default class extends Generator {
   private _createModuleReadmeForDocs() {
     this.fs.copy(
       this.templatePath('precommit/README.md'),
-      this.destinationPath(`modules/${this.sampleModuleName}/README.md`)
+      this.destinationPath(`modules/${Defaults.sampleModuleName}/README.md`)
     );
   }
 
@@ -291,49 +285,57 @@ export default class extends Generator {
   private async _getAnswers() {
     return this.prompt([
       {
-        choices: this.providers,
-        default: 'aws',
+        choices: Defaults.providers.map(p => p.provider),
+        default: this.provider,
         message: 'Provider',
         name: 'provider',
         type: 'list',
       },
+    ]).then(providerAnswers => {
+      this.provider = providerAnswers.provider;
+      return this.prompt(this._getQuestions(this.provider));
+    });
+  }
+
+  private _getQuestions(provider: string): Generator.Questions<any> {
+    return [
       {
-        default: this.regionDefault,
+        default: Defaults.GetDefaultRegion(provider),
         message: 'Region',
         name: 'region',
         type: 'input',
       },
       {
-        default: this.envListDefault,
+        default: Defaults.envListDefault,
         message: 'Environments (comma separated)',
         name: 'environments',
         type: 'input',
       },
       {
-        default: this.stateBucketDefault,
+        default: Defaults.stateBucketDefault,
         message: 'Backend state bucket',
         name: 'stateBucket',
         type: 'input',
       },
       {
-        default: this.stateKeyDefault,
+        default: Defaults.stateKeyDefault,
         message: 'Backend state key',
         name: 'stateKey',
         type: 'input',
       },
       {
-        default: this.lockTableDefault,
+        default: Defaults.lockTableDefault,
         message: 'Backend lock table',
         name: 'lockTable',
         type: 'input',
       },
       {
-        default: this.sampleModuleDefault,
+        default: Defaults.sampleModuleDefault,
         message: 'Create sample module (VPC)?',
         name: 'createSampleModule',
         type: 'confirm',
       },
-    ]);
+    ];
   }
 
   private _appendTpl(
