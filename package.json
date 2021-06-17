@@ -1,6 +1,6 @@
 {
   "name": "generator-tf-infra",
-  "version": "0.3.16",
+  "version": "0.3.17",
   "description": "An opinionated generator for Terraform infrastructure projects",
   "license": "MIT",
   "repository": "https://github.com/shladdergoo/generator-tf-infra",
