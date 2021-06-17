@@ -5,12 +5,14 @@
 
 # Yeoman Generator for Terraform Infrastructure Projects
 
-`generator-tf-infra` is an opinionated generator for [Terraform](https://www.terraform.io/) infrastructure projects. *Currently only supports the [AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs).*
+`generator-tf-infra` is an opinionated generator for [Terraform](https://www.terraform.io/) infrastructure projects. *Currently supports the [AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs) and the [GCP Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs).*
 
 Largely informed by [Terraform: Up & Running](https://www.terraformupandrunning.com/) but with an emphasis on 
 infrastructure being defined once-only with only variables differing across environments.
 
 Also prioritises executing operations from a single common entry point to aid inclusion in CI/CD pipelines and includes supporting tooling, as required.
+
+Lastly, all authentication and credentials are outside of the project.
 
 ## Prerequisites
 1. Install latest [Node LTS](https://nodejs.org).

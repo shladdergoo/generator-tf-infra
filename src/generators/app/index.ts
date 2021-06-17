@@ -4,6 +4,7 @@ import * as Generator from 'yeoman-generator';
 import yosay = require('yosay');
 
 import { Defaults } from './defaults';
+import { QuestionProviderFactory } from './questions/questionProviderFactory';
 
 export default class extends Generator {
   private projectName = this.contextRoot.split('/').pop();
@@ -293,49 +294,12 @@ export default class extends Generator {
       },
     ]).then(providerAnswers => {
       this.provider = providerAnswers.provider;
-      return this.prompt(this._getQuestions(this.provider));
+      return this.prompt(
+        QuestionProviderFactory.getQuestionProvider(
+          this.provider
+        ).GetQuestions()
+      );
     });
-  }
-
-  private _getQuestions(provider: string): Generator.Questions<any> {
-    return [
-      {
-        default: Defaults.GetDefaultRegion(provider),
-        message: 'Region',
-        name: 'region',
-        type: 'input',
-      },
-      {
-        default: Defaults.envListDefault,
-        message: 'Environments (comma separated)',
-        name: 'environments',
-        type: 'input',
-      },
-      {
-        default: Defaults.stateBucketDefault,
-        message: 'Backend state bucket',
-        name: 'stateBucket',
-        type: 'input',
-      },
-      {
-        default: Defaults.stateKeyDefault,
-        message: 'Backend state key',
-        name: 'stateKey',
-        type: 'input',
-      },
-      {
-        default: Defaults.lockTableDefault,
-        message: 'Backend lock table',
-        name: 'lockTable',
-        type: 'input',
-      },
-      {
-        default: Defaults.sampleModuleDefault,
-        message: 'Create sample module (VPC)?',
-        name: 'createSampleModule',
-        type: 'confirm',
-      },
-    ];
   }
 
   private _appendTpl(

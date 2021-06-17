@@ -1,5 +1,8 @@
 export class Defaults {
-  public static providers = [{ provider: 'aws', defaultRegion: 'us-east-1' }];
+  public static providers = [
+    { provider: 'aws', defaultRegion: 'us-east-1' },
+    { provider: 'gcp', defaultRegion: 'us-west1' },
+  ];
   public static envListDefault = ['dev', 'staging', 'prod'];
   public static stateBucketDefault = 'terraform-state';
   public static stateKeyDefault = 'terraform.tfstate';
