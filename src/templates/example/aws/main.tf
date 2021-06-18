@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 0.13"
 }
 
-provider "<%= provider %>" {
+provider "aws" {
   region = "<%= region %>"
 }
 

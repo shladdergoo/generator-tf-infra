@@ -4,11 +4,12 @@ import * as Generator from 'yeoman-generator';
 import yosay = require('yosay');
 
 import { Defaults } from './defaults';
-import { QuestionProviderFactory } from './questions/questionProviderFactory';
+import { CloudProviderFactory } from './providers/cloudProviderFactory';
 
 export default class extends Generator {
-  private projectName = this.contextRoot.split('/').pop();
+  private projectName = this.contextRoot.split('/').pop() ?? 'tf-proj';
   private answers: any;
+  private templateData = new Map<string, any>();
   private provider = Defaults.providers[0].provider;
 
   public constructor(args: any, opts: any) {
@@ -33,14 +34,19 @@ export default class extends Generator {
   public async prompting() {
     this.answers = await this._getAnswers();
     this.answers.environments = this._ensureArray(this.answers.environments);
+
+    this.templateData = CloudProviderFactory.getProvider(
+      this.provider,
+      this.projectName
+    ).GetTemplateData(this.answers);
   }
 
   public writing(): void {
     this.log('copying files');
 
-    this._copyStaticFiles();
-    this._copyReadme();
-    this._copyMakefile(this.provider);
+    this._createStaticFiles();
+    this._createReadme();
+    this._createMakefile(this.provider);
     this._createEnvironments(this.provider);
     this._createMain(this.provider);
     if (this.answers.createSampleModule) {
@@ -78,7 +84,7 @@ export default class extends Generator {
     this._stageGitChanges();
   }
 
-  private _copyStaticFiles(): void {
+  private _createStaticFiles(): void {
     Defaults.statciFiles.forEach(fileCopyTuple => {
       this.fs.copy(
         this.templatePath(fileCopyTuple[0]),
@@ -87,7 +93,7 @@ export default class extends Generator {
     });
   }
 
-  private _copyReadme() {
+  private _createReadme() {
     this.fs.copyTpl(
       this.templatePath('README.md'),
       this.destinationPath('README.md'),
@@ -95,7 +101,7 @@ export default class extends Generator {
     );
   }
 
-  private _copyMakefile(provider: any) {
+  private _createMakefile(provider: any) {
     this.fs.copy(
       this.templatePath(`make/${provider}/Makefile`),
       this.destinationPath('Makefile')
@@ -109,12 +115,7 @@ export default class extends Generator {
         this.destinationPath(
           `${Defaults.dirEnvironments}/${env}/backend.tfvars`
         ),
-        {
-          bucket: this.answers.stateBucket,
-          key: `${env}/${Defaults.stateKeyDefault}`,
-          region: this.answers.region,
-          table: `${env}-${this.answers.lockTable}`,
-        }
+        this.templateData.get(`backend_${env}`)
       );
 
       this.fs.copyTpl(
@@ -122,24 +123,21 @@ export default class extends Generator {
         this.destinationPath(
           `${Defaults.dirEnvironments}/${env}/variables.tfvars`
         ),
-        {
-          env: `${env}`,
-        }
+        this.templateData.get(`variable_${env}`)
       );
     });
   }
 
   private _createMain(provider: string): void {
-    this.fs.copyTpl(
+    this.fs.copy(
       this.templatePath(`main/${provider}/${Defaults.fileMain}`),
-      this.destinationPath(Defaults.fileMain),
-      { provider: this.provider }
+      this.destinationPath(Defaults.fileMain)
     );
 
     this.fs.copyTpl(
       this.templatePath(`main/${provider}/${Defaults.fileVariables}`),
       this.destinationPath(Defaults.fileVariables),
-      { region: this.answers.region }
+      this.templateData.get('variable_main')
     );
   }
 
@@ -170,7 +168,7 @@ export default class extends Generator {
     this._appendTpl(
       this.destinationPath(Defaults.fileVariables),
       this.fs.read(this.templatePath(`module/${provider}/root_variables.tf`)),
-      { region: this.answers.region },
+      this.templateData.get('variable_main'),
       undefined,
       { trimEnd: false }
     );
@@ -178,7 +176,7 @@ export default class extends Generator {
     this._appendTpl(
       this.destinationPath(Defaults.fileMain),
       this.fs.read(this.templatePath(`module/${provider}/root_main.tf`)),
-      { project: this.projectName },
+      this.templateData.get('main_module'),
       undefined,
       { trimEnd: false }
     );
@@ -205,7 +203,7 @@ export default class extends Generator {
       this.destinationPath(
         `${Defaults.dirExamples}/${Defaults.sampleModuleName}/README.md`
       ),
-      { module: Defaults.sampleModuleName, env: this.answers.environments[0] }
+      this.templateData.get('example_readme')
     );
 
     this.fs.copyTpl(
@@ -213,7 +211,7 @@ export default class extends Generator {
       this.destinationPath(
         `${Defaults.dirExamples}/${Defaults.sampleModuleName}/${Defaults.fileMain}`
       ),
-      { provider: this.provider, region: this.answers.region }
+      this.templateData.get('variable_main')
     );
   }
 
@@ -295,8 +293,9 @@ export default class extends Generator {
     ]).then(providerAnswers => {
       this.provider = providerAnswers.provider;
       return this.prompt(
-        QuestionProviderFactory.getQuestionProvider(
-          this.provider
+        CloudProviderFactory.getProvider(
+          this.provider,
+          this.projectName
         ).GetQuestions()
       );
     });

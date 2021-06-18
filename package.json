@@ -31,7 +31,8 @@
     "coverage": "jest --coverage",
     "watch": "npm run build -- --watch",
     "watch:test": "jest --watch",
-    "gen": "npm run build && npm link && rm -rf output && mkdir output && cd output && yo tf-infra && cd .."
+    "gen": "npm run build && npm link && rm -rf output && mkdir output && cd output && yo tf-infra && cd ..",
+    "gen:tests": "npm run build && npm link && rm -rf output && mkdir output && cd output && yo tf-infra --tests && cd .."
   },
   "dependencies": {
     "ejs": "^3.1.5",

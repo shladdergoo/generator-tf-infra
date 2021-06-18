@@ -5,12 +5,6 @@
 *.tfstate
 *.tfstate.*
 
-# .tfvars files
-*.tfvars
-
-# Exclude for testing stuff.
-!testing.tfvars
-
 # IDE config files
 **/.idea/*
 **/.vscode/*
